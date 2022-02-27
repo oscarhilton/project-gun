@@ -37,7 +37,6 @@
 <main>
 	<SvelteToast />
 	<span>{userState.alias}</span>
-	<pre>{JSON.stringify(userState)}</pre>
 	{#if userState.authenticated}
 		<Dashboard />
 	{:else}

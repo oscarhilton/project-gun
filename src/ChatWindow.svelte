@@ -6,12 +6,13 @@
   import gun from './gun'
 
   const { subscribe: subscribeUser } = storeUser
-  const { subscribe: subscribeChat, dispatch: dispatchChat } = storeChat
+  const { subscribe: subscribeChat } = storeChat
 
   export let room;
   // Create a local store to cache data from GUN
   let windowEl
 
+  let newMessage = ''
   let user = {}
   let log = {}
 
@@ -57,6 +58,8 @@
 				.get(room)
 				.get("log")
 				.set(JSON.stringify(json));
+
+    newMessage = ''
   }	
 </script>
 
@@ -76,6 +79,7 @@
           type="text"
           id="message"
           name="message"
+          bind:value={newMessage}
         />
         <button type="submit">Send!</button>
       </form>

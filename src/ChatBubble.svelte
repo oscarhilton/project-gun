@@ -1,8 +1,15 @@
 <script>
+  import { onMount } from 'svelte'
+
   export let messageJSON;
   export let user
 
-  $: message = typeof messageJSON === 'string' && JSON.parse(messageJSON)
+  $: message = typeof messageJSON === 'string' && JSON.parse(messageJSON) || messageJSON;
+  $: user
+
+  onMount(async () => {
+console.log(user, messageJSON)
+  })  
   
 </script>
 

@@ -8,7 +8,7 @@
   <div>
     <Chats />
   </div>
-  <div>
+  <!-- <div>
     <UserList />
-  </div>
+  </div> -->
 </div>

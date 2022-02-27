@@ -3,10 +3,14 @@
     import store, { Actions } from './store/chat'
     import ChatWindow from './ChatWindow.svelte'
 
-    const { dispatch } = store
+    const { dispatch, subscribe } = store
 
     let room = 'Empty'
     onMount(async () => {
+      subscribe(async (chatState) => {
+        const getState = await chatState;
+        room = await getState.room
+      })
       dispatch({ action: Actions.GET_LOG, payload: 'public' })
     })
     $: room

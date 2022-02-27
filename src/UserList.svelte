@@ -13,7 +13,6 @@
 </script>
 
 <div>
-  <pre>{userListState && JSON.stringify(userListState)}</pre>
   <ul>
     {#each userListState as userDetail}
       <li>

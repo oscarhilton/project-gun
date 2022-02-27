@@ -1,8 +1,8 @@
 <script>
-  import { onMount } from 'svelte'
+  import { onMount, afterUpdate } from 'svelte'
   import ChatBubble from './ChatBubble.svelte';
   import storeUser from './store/user'
-  import storeChat, { Actions as ChatActions } from './store/chat'
+  import storeChat from './store/chat'
   import gun from './gun'
 
   const { subscribe: subscribeUser } = storeUser
@@ -16,25 +16,29 @@
   let user = {}
   let log = {}
 
+  $: windowEl
+
   onMount(async () => {
     subscribeUser(async (userState) => {
       const getState = await userState;
       user = await getState.user;
     })
 
-    subscribeChat(async (chatState) => {
-      const getState = await chatState;
-      log = await getState.log
+    gun.get('chats').get(room).get('log').on(async (gunLog) => {
+      log = gunLog;
+    })
+  })
+
+  afterUpdate(() => {
+    windowEl.scrollTo({
+      top: windowEl.scrollHeight,
+      behavior: 'smooth'
     })
   })
 
   $: log
   $: user
-	$: log = Object.entries(log)
-
-  gun.get('chats').get(room).get('log').on((gunLog) => {
-    log = gunLog
-  })
+	$: log = Object.entries(log).sort(([_1, a], [_2, b]) => (+new Date(a.timestamp) > +new Date(b.timestamp)) ? -1 : 1)
 
   async function onSubmit(e) {
     const formData = new FormData(e.target);
@@ -72,16 +76,18 @@
     {/each}
   </div>
   <div>
-    <div class='text-box'>
-      <form on:submit|preventDefault={onSubmit}>
-        <input 
-          class="text-input" 
-          type="text"
-          id="message"
-          name="message"
-          bind:value={newMessage}
-        />
-        <button type="submit">Send!</button>
+    <div>
+      <form class="text-form" on:submit|preventDefault={onSubmit}>
+        <div class='text-box'>
+          <input 
+            class="text-input" 
+            type="text"
+            id="message"
+            name="message"
+            bind:value={newMessage}
+          />
+        </div>
+        <!-- <button type="submit">Send!</button> -->
       </form>
     </div>
   </div>
@@ -93,6 +99,7 @@
     display: flex;
     flex-direction: column;
     background-color: rgba(0, 0, 0, 0.05);
+    max-height: 400px;
   }
   .chat-window {
     height: 100%;
@@ -117,6 +124,13 @@
     z-index: 2;
   }
 
+  .text-form {
+    width: calc(100% - 60px);
+    padding: 30px;
+    display: flex;
+    flex-grow: 1;
+  }
+
   .image {
     width: 200px;
     height: 200px;
@@ -129,10 +143,14 @@
 
   .text-box {
     margin: 10px 0;
-    padding: 20px;
+    padding: 10px;
     position: relative;
     display: flex;
     align-items: center;
+    z-index: 3;
+    background: rgba(0, 0, 0, 0.1);
+    width: 100%;
+    height: 100%;
   }
 
   .text-box::before {
@@ -144,8 +162,6 @@
     left: 0;
     bottom: 0;
     right: 0;
-    background: rgba(255, 255, 255, 0.8);
-    border-radius: 10px;
     z-index: -1;
   } 
 </style>
